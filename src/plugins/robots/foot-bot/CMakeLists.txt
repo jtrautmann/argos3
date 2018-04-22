@@ -8,6 +8,7 @@ set(ARGOS3_HEADERS_PLUGINS_ROBOTS_FOOTBOT_CONTROLINTERFACE
   control_interface/ci_footbot_distance_scanner_sensor.h
   control_interface/ci_footbot_encoder_sensor.h
   control_interface/ci_footbot_gripper_actuator.h
+  control_interface/ci_footbot_lidar_sensor.h
   control_interface/ci_footbot_light_sensor.h
   control_interface/ci_footbot_motor_ground_sensor.h
   control_interface/ci_footbot_proximity_sensor.h
@@ -43,6 +44,7 @@ set(ARGOS3_SOURCES_PLUGINS_ROBOTS_FOOTBOT
   control_interface/ci_footbot_distance_scanner_sensor.cpp
   control_interface/ci_footbot_encoder_sensor.cpp
   control_interface/ci_footbot_gripper_actuator.cpp
+  control_interface/ci_footbot_lidar_sensor.cpp
   control_interface/ci_footbot_light_sensor.cpp
   control_interface/ci_footbot_motor_ground_sensor.cpp
   control_interface/ci_footbot_proximity_sensor.cpp
