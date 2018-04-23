@@ -26,6 +26,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     simulator/footbot_distance_scanner_rotzonly_sensor.h
     simulator/footbot_entity.h
     simulator/footbot_gripper_default_actuator.h
+    simulator/footbot_lidar_default_sensor.h
     simulator/footbot_light_rotzonly_sensor.h
     simulator/footbot_motor_ground_rotzonly_sensor.h
     simulator/footbot_proximity_default_sensor.h
@@ -64,6 +65,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     simulator/footbot_distance_scanner_rotzonly_sensor.cpp
     simulator/footbot_entity.cpp
     simulator/footbot_gripper_default_actuator.cpp
+    simulator/footbot_lidar_default_sensor.cpp
     simulator/footbot_light_rotzonly_sensor.cpp
     simulator/footbot_motor_ground_rotzonly_sensor.cpp
     simulator/footbot_proximity_default_sensor.cpp
