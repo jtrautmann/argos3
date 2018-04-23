@@ -1,5 +1,5 @@
 /**
- * @file <argos3/plugins/robots/generic/control_interface/ci_proximity_sensor.h>
+ * @file <argos3/plugins/robots/generic/control_interface/ci_lidar_sensor.h>
  *
  * @author Carlo Pinciroli <ilpincy@gmail.com>
  * @author Andreas Pasternak <andreas.pasternak@gmx.ch>

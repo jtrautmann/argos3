@@ -1,5 +1,5 @@
 /**
- * @file <argos3/plugins/robots/generic/control_interface/ci_proximity_sensor.cpp>
+ * @file <argos3/plugins/robots/generic/control_interface/ci_lidar_sensor.cpp>
  *
  * @author Carlo Pinciroli <ilpincy@gmail.com>
  * @author Andreas Pasternak <andreas.pasternak@gmx.ch>
@@ -25,7 +25,7 @@ namespace argos {
 
 #ifdef ARGOS_WITH_LUA
    void CCI_LidarSensor::CreateLuaState(lua_State* pt_lua_state) {
-      CLuaUtility::OpenRobotStateTable(pt_lua_state, "proximity");
+      CLuaUtility::OpenRobotStateTable(pt_lua_state, "lidar");
       for(size_t i = 0; i < m_tReadings.size(); ++i) {
          CLuaUtility::AddToTable(pt_lua_state, i+1, m_tReadings[i]);
       }
@@ -38,7 +38,7 @@ namespace argos {
 
 #ifdef ARGOS_WITH_LUA
    void CCI_LidarSensor::ReadingsToLuaState(lua_State* pt_lua_state) {
-      lua_getfield(pt_lua_state, -1, "proximity");
+      lua_getfield(pt_lua_state, -1, "lidar");
       for(size_t i = 0; i < m_tReadings.size(); ++i) {
          lua_pushnumber(pt_lua_state, i+1           );
          lua_pushnumber(pt_lua_state, m_tReadings[i]);

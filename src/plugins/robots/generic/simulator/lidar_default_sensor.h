@@ -1,5 +1,5 @@
 /**
- * @file <argos3/plugins/simulator/sensors/proximity_default_sensor.h>
+ * @file <argos3/plugins/simulator/sensors/lidar_default_sensor.h>
  *
  * @author Carlo Pinciroli - <ilpincy@gmail.com>
  * @author Andreas Pasternak - <andreas.pasternak@gmx.ch>
@@ -53,7 +53,7 @@ namespace argos {
       /** Reference to embodied entity associated to this sensor */
       CEmbodiedEntity* m_pcEmbodiedEntity;
 
-      /** Reference to proximity sensor equipped entity associated to this sensor */
+      /** Reference to lidar sensor equipped entity associated to this sensor */
       CLidarSensorEquippedEntity* m_pcLidarEntity;
 
       /** Reference to controllable entity associated to this sensor */

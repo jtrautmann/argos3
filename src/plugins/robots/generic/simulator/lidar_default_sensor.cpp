@@ -1,5 +1,5 @@
 /**
- * @file <argos3/plugins/simulator/sensors/proximity_default_sensor.cpp>
+ * @file <argos3/plugins/simulator/sensors/lidar_default_sensor.cpp>
  *
  * @author Carlo Pinciroli - <ilpincy@gmail.com>
  * @author Andreas Pasternak - <andreas.pasternak@gmx.ch>
@@ -31,7 +31,7 @@ namespace argos {
       try {
          m_pcEmbodiedEntity = &(c_entity.GetComponent<CEmbodiedEntity>("body"));
          m_pcControllableEntity = &(c_entity.GetComponent<CControllableEntity>("controller"));
-         m_pcLidarEntity = &(c_entity.GetComponent<CLidarSensorEquippedEntity>("proximity_sensors"));
+         m_pcLidarEntity = &(c_entity.GetComponent<CLidarSensorEquippedEntity>("lidar_sensors"));
          m_pcLidarEntity->Enable();
       }
       catch(CARGoSException& ex) {
@@ -147,7 +147,7 @@ namespace argos {
                    "lidar", "default",
                    "Carlo Pinciroli [ilpincy@gmail.com], Andreas Pasternak [andreas.pasternak@gmx.ch]",
                    "1.0",
-                   "A generic proximity sensor.",
+                   "A generic lidar sensor.",
                    "This sensor accesses a lidar scanner. The readings are\n"
                    "between 0 and the configured sensor maximal range and represent the distance \n"
                    "of the occluding object. In controllers, you must include the ci_lidar_sensor.h header.\n\n"
