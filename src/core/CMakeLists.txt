@@ -3,6 +3,7 @@
 #
 # argos3/core/utility
 set(ARGOS3_HEADERS_UTILITY
+  utility/rate.h
   utility/signal_processing.h
   utility/string_utilities.h)
 # argos3/core/utility/configuration
@@ -46,6 +47,7 @@ set(ARGOS3_HEADERS_UTILITY_MATH
   utility/math/angles.h
   utility/math/box.h
   utility/math/cylinder.h
+  utility/math/convex_hull.h
   utility/math/general.h
   utility/math/plane.h
   utility/math/quaternion.h
@@ -110,7 +112,13 @@ set(ARGOS3_HEADERS_SIMULATOR_SPACE
 # argos3/core/wrappers/lua
 set(ARGOS3_HEADERS_WRAPPERS_LUA
   wrappers/lua/lua_controller.h
-  wrappers/lua/lua_utility.h)
+  wrappers/lua/lua_quaternion.h
+  wrappers/lua/lua_utility.h
+  wrappers/lua/lua_vector2.h
+  wrappers/lua/lua_vector3.h)
+# argos3/core/real_robot
+set(ARGOS3_HEADERS_REALROBOT
+  real_robot/real_robot.h)
 
 #
 # Source files
@@ -118,6 +126,7 @@ set(ARGOS3_HEADERS_WRAPPERS_LUA
 # Common for all builds
 set(ARGOS3_SOURCES_CORE
   ${ARGOS3_HEADERS_UTILITY}
+  utility/rate.cpp
   utility/signal_processing.cpp
   utility/string_utilities.cpp
   ${ARGOS3_HEADERS_UTILITY_CONFIGURATION}
@@ -139,15 +148,16 @@ set(ARGOS3_SOURCES_CORE
   ${ARGOS3_HEADERS_UTILITY_PROFILER}
   utility/profiler/profiler.cpp
   ${ARGOS3_HEADERS_UTILITY_MATH}
-  ${ARGOS3_HEADERS_UTILITY_MATH_MATRIX}
   utility/math/angles.cpp
   utility/math/box.cpp
   utility/math/cylinder.cpp
+  utility/math/convex_hull.cpp
   utility/math/vector2.cpp
   utility/math/vector3.cpp
   utility/math/plane.cpp
   utility/math/ray3.cpp
   utility/math/rng.cpp
+  ${ARGOS3_HEADERS_UTILITY_MATH_MATRIX}
   utility/math/matrix/squarematrix.cpp
   utility/math/matrix/rotationmatrix3.cpp
   utility/math/matrix/rotationmatrix2.cpp
@@ -186,6 +196,12 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
     simulator/space/space_multi_thread_balance_length.cpp
     simulator/space/space_multi_thread_balance_quantity.cpp
     simulator/space/space_no_threads.cpp)
+else(ARGOS_BUILD_FOR_SIMULATOR)
+  # Real-robot only code
+  set(ARGOS3_SOURCES_CORE
+    ${ARGOS3_SOURCES_CORE}
+    ${ARGOS3_HEADERS_REALROBOT}
+    real_robot/real_robot.cpp)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
 # Compile Lua wrapper only if Lua was found
 if(ARGOS_WITH_LUA)
@@ -193,7 +209,10 @@ if(ARGOS_WITH_LUA)
     ${ARGOS3_SOURCES_CORE}
     ${ARGOS3_HEADERS_WRAPPERS_LUA}
     wrappers/lua/lua_controller.cpp
-    wrappers/lua/lua_utility.cpp)
+    wrappers/lua/lua_quaternion.cpp
+    wrappers/lua/lua_utility.cpp
+    wrappers/lua/lua_vector2.cpp
+    wrappers/lua/lua_vector3.cpp)
 endif(ARGOS_WITH_LUA)
 
 
@@ -240,6 +259,8 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
   install(FILES ${ARGOS3_HEADERS_SIMULATOR_VISUALIZATION}     DESTINATION include/argos3/core/simulator/visualization)
   install(FILES ${ARGOS3_HEADERS_SIMULATOR_SPACE_POSITIONAL_INDICES} DESTINATION include/argos3/core/simulator/space/positional_indices)
   install(FILES ${ARGOS3_HEADERS_SIMULATOR_SPACE}             DESTINATION include/argos3/core/simulator/space)
+else(ARGOS_BUILD_FOR_SIMULATOR)
+  install(FILES ${ARGOS3_HEADERS_REALROBOT}                   DESTINATION include/argos3/core/real_robot)
 endif(ARGOS_BUILD_FOR_SIMULATOR)
 if(ARGOS_WITH_LUA)
   install(FILES ${ARGOS3_HEADERS_WRAPPERS_LUA}                DESTINATION include/argos3/core/wrappers/lua)
@@ -277,7 +298,7 @@ if(ARGOS_BUILD_FOR_SIMULATOR)
   install(
     FILES
     ${CMAKE_SOURCE_DIR}/cmake/ARGoSCheckQTOpenGL.cmake
-    ${CMAKE_SOURCE_DIR}/cmake/FindLua52.cmake
+    ${CMAKE_SOURCE_DIR}/cmake/FindLua53.cmake
     DESTINATION
     share/argos3/cmake)
   #

@@ -1,7 +1,7 @@
 /**
  * @file <argos3/core/utility/math/vector2.h>
  *
- * @author Carlo Pinciroli <ilpincy@gmail.com>
+ * @author Carlo Pinciroli - <ilpincy@gmail.com>
  */
 
 #ifndef VECTOR2_H
@@ -13,7 +13,9 @@ namespace argos {
 
 #include <argos3/core/utility/math/general.h>
 #include <argos3/core/utility/math/angles.h>
+#include <argos3/core/utility/math/matrix/matrix.h>
 #include <argos3/core/utility/string_utilities.h>
+#include <array>
 #include <iostream>
 #include <cmath>
 
@@ -34,6 +36,9 @@ namespace argos {
 
       /** The <em>y</em> axis */
       static const CVector2 Y;
+
+      /** The zero vector (0,0) */
+      static const CVector2 ZERO;
 
       /**
        * Class constructor.
@@ -56,6 +61,16 @@ namespace argos {
                Real f_y) :
          m_fX(f_x),
          m_fY(f_y) {
+      }
+
+      /**
+       * Class constructor.
+       * It initializes the vector from Cartesian coordinates.
+       * @param arr_coordinates The coordinates.
+       * @see Set()
+       */
+      CVector2(const std::array<Real, 2>& arr_coordinates) {
+         Set(arr_coordinates);
       }
 
       /**
@@ -111,6 +126,15 @@ namespace argos {
       inline void Set(Real f_x, Real f_y) {
          m_fX = f_x;
          m_fY = f_y;
+      }
+
+      /**
+       * Sets the vector contents from Cartesian coordinates.
+       * @param arr_coordinates The new coordinates.
+       */
+      inline void Set(const std::array<Real, 2>& arr_coordinates) {
+         m_fX = arr_coordinates[0];
+         m_fY = arr_coordinates[1];
       }
 
       /**
@@ -342,6 +366,26 @@ namespace argos {
          CVector2 cResult(*this);
          cResult /= f_value;
          return cResult;
+      }
+
+      /**
+       * Implict conversion to a row matrix.
+       */
+      operator CMatrix<1,2>() const {
+         CMatrix<1,2> cMatrix;
+         cMatrix(0,0) = m_fX;
+         cMatrix(0,1) = m_fY;
+         return cMatrix;
+      }
+
+      /**
+       * Implict conversion to a column matrix.
+       */
+      operator CMatrix<2,1>() const {
+         CMatrix<2,1> cMatrix;
+         cMatrix(0,0) = m_fX;
+         cMatrix(1,0) = m_fY;
+         return cMatrix;
       }
 
       /**

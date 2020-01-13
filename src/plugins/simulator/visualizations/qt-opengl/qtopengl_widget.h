@@ -55,7 +55,7 @@ namespace argos {
 
    class CQTOpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions {
 
-      Q_OBJECT
+    Q_OBJECT
 
     public:
 
@@ -63,18 +63,24 @@ namespace argos {
        * Data regarding frame grabbing
        */
       struct SFrameGrabData {
-         bool Grabbing;     // true when grabbing
-         QString Directory; // output directory
-         QString BaseName;  // frame file basename
-         QString Format;    // output file format
-         SInt32 Quality;    // output quality [0-100]
+         bool GUIGrabbing;          // true when grabbing enabled from GUI
+         bool HeadlessGrabbing;     // true when headless grabbing enabled
+         UInt32 HeadlessFrameRate;  // Grab every nth frame
+         QString Directory;         // output directory
+         QString BaseName;          // frame file basename
+         QString Format;            // output file format
+         SInt32 Quality;            // output quality [0-100]
+         QSize  Size;               // Frame size
 
          SFrameGrabData() :
-            Grabbing(false),
+            GUIGrabbing(false),
+            HeadlessGrabbing(false),
+            HeadlessFrameRate(1),
             Directory("."),
             BaseName("frame_"),
             Format("png"),
-            Quality(-1) {}
+            Quality(-1),
+            Size(1600, 1200) {}
 
          void Init(TConfigurationNode& t_tree);
       };
@@ -223,8 +229,15 @@ namespace argos {
       /**
        * Sets whether the mouse should be inverted when moving.
        */
-      inline void SetInvertMouse(bool b_InvertMouse) {
-    	  m_bInvertMouse = b_InvertMouse;
+      inline void SetInvertMouse(bool b_invert_mouse) {
+         m_bInvertMouse = b_invert_mouse;
+      }
+
+      /**
+       * Sets whether the boundary walls should be rendered.
+       */
+      inline void SetShowBoundary(bool b_show_boundary) {
+         m_bShowBoundary = b_show_boundary;
       }
 
    signals:
@@ -366,6 +379,9 @@ namespace argos {
       /** Reference to the space state */
       CSpace& m_cSpace;
 
+      /** True if the boundary walls should be shown */
+      bool m_bShowBoundary;
+
       /** True if using a user-defined texture for the floor */
       bool m_bUsingFloorTexture;
       /** The user-defined floor texture */
@@ -383,9 +399,9 @@ namespace argos {
       GLfloat* m_pfLight1Position;
 
       /** Display list for arena elements */
-      GLuint m_unArenaList;
+      //GLuint m_unArenaList;
       /** Display list for floor elements */
-      GLuint m_unFloorList;
+      //GLuint m_unFloorList;
 
       /** Current state of the camera */
       CQTOpenGLCamera m_cCamera;

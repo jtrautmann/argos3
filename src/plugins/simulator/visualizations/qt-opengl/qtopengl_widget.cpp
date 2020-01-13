@@ -31,7 +31,7 @@
 namespace argos {
 
    static const Real ASPECT_RATIO         = 4.0f / 3.0f;
-   
+
    /****************************************/
    /****************************************/
 
@@ -50,11 +50,12 @@ namespace argos {
       m_bInvertMouse(false),
       m_cSimulator(CSimulator::GetInstance()),
       m_cSpace(m_cSimulator.GetSpace()),
+      m_bShowBoundary(true),
       m_bUsingFloorTexture(false),
       m_pcFloorTexture(NULL),
       m_pcGroundTexture(NULL) {
       /* Set the widget's size policy */
-      QSizePolicy cSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+      QSizePolicy cSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
       cSizePolicy.setHeightForWidth(true);
       setSizePolicy(cSizePolicy);
       /* Grab focus when clicked on */
@@ -76,10 +77,8 @@ namespace argos {
    CQTOpenGLWidget::~CQTOpenGLWidget() {
       makeCurrent();
       delete m_pcGroundTexture;
-      glDeleteLists(1, m_unArenaList);
       if(m_bUsingFloorTexture) {
          delete m_pcFloorTexture;
-         glDeleteLists(1, m_unFloorList);
       }
       doneCurrent();
    }
@@ -188,7 +187,7 @@ namespace argos {
       // cPainter.drawText(rect(), QString("%1 FPS").arg(m_fFPS, 0, 'f', 0));
       cPainter.end();
       /* Grab frame, if necessary */
-      if(m_sFrameGrabData.Grabbing) {
+      if(m_sFrameGrabData.GUIGrabbing || m_sFrameGrabData.HeadlessGrabbing) {
          QString strFileName = QString("%1/%2%3.%4")
             .arg(m_sFrameGrabData.Directory)
             .arg(m_sFrameGrabData.BaseName)
@@ -552,7 +551,7 @@ namespace argos {
    /****************************************/
 
    void CQTOpenGLWidget::SetGrabFrame(bool b_grab_on) {
-      m_sFrameGrabData.Grabbing = b_grab_on;
+     m_sFrameGrabData.GUIGrabbing = b_grab_on;
    }
 
    /****************************************/
@@ -726,45 +725,47 @@ namespace argos {
 #endif
       /* Disable the textures */
       glDisable(GL_TEXTURE_2D);
-      /* Draw walls */
-      glDisable(GL_CULL_FACE);
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-      glLineWidth(10.0f);
-      glColor3f(0.0f, 0.0f, 0.0f);
-      /* This part covers the top and bottom faces (parallel to XY) */
-      glBegin(GL_QUADS);
-      /* Top face */
-      glVertex3f(cArenaMinCorner.GetX(), cArenaMinCorner.GetY(), cArenaMaxCorner.GetZ());
-      glVertex3f(cArenaMaxCorner.GetX(), cArenaMinCorner.GetY(), cArenaMaxCorner.GetZ());
-      glVertex3f(cArenaMaxCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMaxCorner.GetZ());
-      glVertex3f(cArenaMinCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMaxCorner.GetZ());
-      glEnd();
-      /* This part covers the faces (South, East, North, West) */
-      glBegin(GL_QUADS);
-      /* South face */
-      glVertex3f(cArenaMinCorner.GetX(), cArenaMinCorner.GetY(), cArenaMinCorner.GetZ());
-      glVertex3f(cArenaMinCorner.GetX(), cArenaMinCorner.GetY(), cArenaMaxCorner.GetZ());
-      glVertex3f(cArenaMinCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMaxCorner.GetZ());
-      glVertex3f(cArenaMinCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMinCorner.GetZ());
-      /* East face */
-      glVertex3f(cArenaMinCorner.GetX(), cArenaMinCorner.GetY(), cArenaMinCorner.GetZ());
-      glVertex3f(cArenaMaxCorner.GetX(), cArenaMinCorner.GetY(), cArenaMinCorner.GetZ());
-      glVertex3f(cArenaMaxCorner.GetX(), cArenaMinCorner.GetY(), cArenaMaxCorner.GetZ());
-      glVertex3f(cArenaMinCorner.GetX(), cArenaMinCorner.GetY(), cArenaMaxCorner.GetZ());
-      /* North face */
-      glVertex3f(cArenaMaxCorner.GetX(), cArenaMinCorner.GetY(), cArenaMinCorner.GetZ());
-      glVertex3f(cArenaMaxCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMinCorner.GetZ());
-      glVertex3f(cArenaMaxCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMaxCorner.GetZ());
-      glVertex3f(cArenaMaxCorner.GetX(), cArenaMinCorner.GetY(), cArenaMaxCorner.GetZ());
-      /* West face */
-      glVertex3f(cArenaMinCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMinCorner.GetZ());
-      glVertex3f(cArenaMinCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMaxCorner.GetZ());
-      glVertex3f(cArenaMaxCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMaxCorner.GetZ());
-      glVertex3f(cArenaMaxCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMinCorner.GetZ());
-      glEnd();
-      glLineWidth(1.0f);
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-      glEnable(GL_CULL_FACE);
+      if(m_bShowBoundary) {
+         /* Draw walls */
+         glDisable(GL_CULL_FACE);
+         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+         glLineWidth(10.0f);
+         glColor3f(0.0f, 0.0f, 0.0f);
+         /* This part covers the top and bottom faces (parallel to XY) */
+         glBegin(GL_QUADS);
+         /* Top face */
+         glVertex3f(cArenaMinCorner.GetX(), cArenaMinCorner.GetY(), cArenaMaxCorner.GetZ());
+         glVertex3f(cArenaMaxCorner.GetX(), cArenaMinCorner.GetY(), cArenaMaxCorner.GetZ());
+         glVertex3f(cArenaMaxCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMaxCorner.GetZ());
+         glVertex3f(cArenaMinCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMaxCorner.GetZ());
+         glEnd();
+         /* This part covers the faces (South, East, North, West) */
+         glBegin(GL_QUADS);
+         /* South face */
+         glVertex3f(cArenaMinCorner.GetX(), cArenaMinCorner.GetY(), cArenaMinCorner.GetZ());
+         glVertex3f(cArenaMinCorner.GetX(), cArenaMinCorner.GetY(), cArenaMaxCorner.GetZ());
+         glVertex3f(cArenaMinCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMaxCorner.GetZ());
+         glVertex3f(cArenaMinCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMinCorner.GetZ());
+         /* East face */
+         glVertex3f(cArenaMinCorner.GetX(), cArenaMinCorner.GetY(), cArenaMinCorner.GetZ());
+         glVertex3f(cArenaMaxCorner.GetX(), cArenaMinCorner.GetY(), cArenaMinCorner.GetZ());
+         glVertex3f(cArenaMaxCorner.GetX(), cArenaMinCorner.GetY(), cArenaMaxCorner.GetZ());
+         glVertex3f(cArenaMinCorner.GetX(), cArenaMinCorner.GetY(), cArenaMaxCorner.GetZ());
+         /* North face */
+         glVertex3f(cArenaMaxCorner.GetX(), cArenaMinCorner.GetY(), cArenaMinCorner.GetZ());
+         glVertex3f(cArenaMaxCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMinCorner.GetZ());
+         glVertex3f(cArenaMaxCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMaxCorner.GetZ());
+         glVertex3f(cArenaMaxCorner.GetX(), cArenaMinCorner.GetY(), cArenaMaxCorner.GetZ());
+         /* West face */
+         glVertex3f(cArenaMinCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMinCorner.GetZ());
+         glVertex3f(cArenaMinCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMaxCorner.GetZ());
+         glVertex3f(cArenaMaxCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMaxCorner.GetZ());
+         glVertex3f(cArenaMaxCorner.GetX(), cArenaMaxCorner.GetY(), cArenaMinCorner.GetZ());
+         glEnd();
+         glLineWidth(1.0f);
+         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+         glEnable(GL_CULL_FACE);
+      }
       /* Restore lighting */
       glEnable(GL_LIGHTING);
    }
@@ -847,8 +848,10 @@ namespace argos {
             with the plane created before */
          CVector3 cNewPos;
          if(cMouseRay.Intersects(cXYPlane, cNewPos)) {
-            pcEntity->MoveTo(cNewPos,
-                             pcEntity->GetOriginAnchor().Orientation);
+            CVector3 cOldPos(pcEntity->GetOriginAnchor().Position);
+            if(pcEntity->MoveTo(cNewPos, pcEntity->GetOriginAnchor().Orientation)) {
+               m_cUserFunctions.EntityMoved(pcEntity->GetRootEntity(), cOldPos, cNewPos);
+            }
             /* Entity moved, redraw */
             update();
          }
@@ -977,6 +980,27 @@ namespace argos {
          Format = strBuffer.c_str();
          /* Parse quality */
          GetNodeAttributeOrDefault(tNode, "quality", Quality, Quality);
+
+         /* Parse headless grabbing */
+         GetNodeAttributeOrDefault(tNode,
+                                   "headless_grabbing",
+                                   HeadlessGrabbing,
+                                   HeadlessGrabbing);
+         /* Parse headless frame size */
+         strBuffer = "1600x1200";
+         GetNodeAttributeOrDefault(tNode,
+                                   "headless_frame_size",
+                                   strBuffer,
+                                   strBuffer);
+         uint dims[2];
+         ParseValues(strBuffer, 2, dims, 'x');
+         Size = QSize(dims[0], dims[1]);
+
+         /* Parse headless frame rate */
+         GetNodeAttributeOrDefault(tNode,
+                                   "headless_frame_rate",
+                                   HeadlessFrameRate,
+                                   HeadlessFrameRate);
       }
    }
 

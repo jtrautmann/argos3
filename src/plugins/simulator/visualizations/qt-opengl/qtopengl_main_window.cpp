@@ -82,14 +82,9 @@ namespace argos {
          }
       }
 
-      virtual QSize minimumSize () const {
-         return QSize(320,240);
-      }
-
       virtual QSize sizeHint () const {
          return QSize(640,480);
       }
-
       virtual void setGeometry(const QRect& r) {
          /* Set the layout geometry */
          QLayout::setGeometry(r);
@@ -163,8 +158,12 @@ namespace argos {
       /* Should we play instantly? */
       bool bAutoPlay = false;
       GetNodeAttributeOrDefault(t_tree, "autoplay", bAutoPlay, bAutoPlay);
-      if(bAutoPlay) {
-         PlayExperiment();
+      if (bAutoPlay) {
+        if (m_pcOpenGLWidget->GetFrameGrabData().HeadlessGrabbing) {
+          FastForwardExperiment();
+        } else {
+          PlayExperiment();
+        }
       }
    }
 
@@ -209,6 +208,16 @@ namespace argos {
          m_strTextureDir = QString::fromStdString(CSimulator::GetInstance().GetInstallationDirectory());
          m_strTextureDir += "/include/argos3/plugins/simulator/visualizations/qt-opengl/textures/";
       }
+      if(cSettings.contains("model_dir")) {
+         m_strModelDir = cSettings.value("model_dir").toString();
+         if(m_strModelDir.at(m_strModelDir.length()-1) != '/') {
+            m_strModelDir.append("/");
+         }
+      }
+      else {
+         m_strModelDir = QString::fromStdString(CSimulator::GetInstance().GetInstallationDirectory());
+         m_strModelDir += "/include/argos3/plugins/simulator/visualizations/qt-opengl/models/";
+      }
       cSettings.endGroup();
    }
 
@@ -233,6 +242,7 @@ namespace argos {
       cSettings.setValue("position", pos());
       cSettings.setValue("icon_dir", m_strIconDir);
       cSettings.setValue("texture_dir", m_strTextureDir);
+      cSettings.setValue("model_dir", m_strModelDir);
       cSettings.endGroup();
    }
 
@@ -466,10 +476,23 @@ namespace argos {
       m_pcOpenGLWidget->setCursor(QCursor(Qt::OpenHandCursor));
       m_pcOpenGLWidget->GetCamera().Init(t_tree);
       m_pcOpenGLWidget->GetFrameGrabData().Init(t_tree);
+
+      /* Set headless grabbing frame size after it has been parsed */
+      if (m_pcOpenGLWidget->GetFrameGrabData().HeadlessGrabbing) {
+        setMinimumSize(m_pcOpenGLWidget->GetFrameGrabData().Size);
+        m_pcOpenGLWidget->SetDrawFrameEvery(
+            m_pcOpenGLWidget->GetFrameGrabData().HeadlessFrameRate);
+      } else {
+        setMinimumSize(QSize(320, 240));
+      }
       /* Invert mouse controls? */
       bool bInvertMouse;
       GetNodeAttributeOrDefault(t_tree, "invert_mouse", bInvertMouse, false);
       m_pcOpenGLWidget->SetInvertMouse(bInvertMouse);
+      /* Show boundary walls? */
+      bool bShowBoundary;
+      GetNodeAttributeOrDefault(t_tree, "show_boundary", bShowBoundary, true);
+      m_pcOpenGLWidget->SetShowBoundary(bShowBoundary);
       /* Set the window as the central widget */
       CQTOpenGLLayout* pcQTOpenGLLayout = new CQTOpenGLLayout();
       pcQTOpenGLLayout->addWidget(m_pcOpenGLWidget);
@@ -788,6 +811,13 @@ namespace argos {
       /* Change state and emit signal */
       m_eExperimentState = EXPERIMENT_DONE;
       emit ExperimentDone();
+
+      /*
+       * Invisible window does not close automatically when simulation finishes
+       */
+      if (m_pcOpenGLWidget->GetFrameGrabData().HeadlessGrabbing) {
+        qApp->exit();
+      }
    }
 
    /****************************************/

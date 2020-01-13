@@ -1,7 +1,7 @@
 #
 # Set minimum required version
 #
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.5.1)
 
 #
 # Set the path additional cmake files must be searched for
@@ -73,7 +73,9 @@ endif(NOT EXISTS ${CMAKE_BINARY_DIR}/argos3)
 #
 add_subdirectory(core)
 add_subdirectory(plugins)
-add_subdirectory(testing)
+if(ARGOS_BUILD_FOR_SIMULATOR)
+  add_subdirectory(testing)
+endif(ARGOS_BUILD_FOR_SIMULATOR)
 
 #
 # Create documentation

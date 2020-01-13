@@ -7,7 +7,10 @@
 #include "lua_controller.h"
 #include <argos3/core/utility/logging/argos_log.h>
 
+#include <argos3/core/wrappers/lua/lua_quaternion.h>
 #include <argos3/core/wrappers/lua/lua_utility.h>
+#include <argos3/core/wrappers/lua/lua_vector2.h>
+#include <argos3/core/wrappers/lua/lua_vector3.h>
 
 namespace argos {
 
@@ -113,16 +116,16 @@ namespace argos {
       m_ptLuaState = luaL_newstate();
       /* Load the Lua libraries */
       luaL_openlibs(m_ptLuaState);
+      /* Create and set variables */
+      CreateLuaState();
+      SensorReadingsToLuaState();
+      ParametersToLuaState(t_tree);
       /* Load script */
       if(!CLuaUtility::LoadScript(m_ptLuaState, str_script)) {
          m_bIsOK = false;
          return;
       }
       m_strScriptFileName = str_script;
-      /* Create and set variables */
-      CreateLuaState();
-      SensorReadingsToLuaState();
-      ParametersToLuaState(t_tree);
       /* Execute script init function */
       if(!CLuaUtility::CallLuaFunction(m_ptLuaState, "init")) {
          m_bIsOK = false;
@@ -146,6 +149,10 @@ namespace argos {
    void CLuaController::CreateLuaState() {
       /* Register functions */
       CLuaUtility::RegisterLoggerWrapper(m_ptLuaState);
+      /* Register metatables */
+      CLuaVector2::RegisterType(m_ptLuaState);
+      CLuaVector3::RegisterType(m_ptLuaState);
+      CLuaQuaternion::RegisterType(m_ptLuaState);
       /* Create a table that will contain the state of the robot */
       lua_newtable(m_ptLuaState);
       /* Set the id of the robot */

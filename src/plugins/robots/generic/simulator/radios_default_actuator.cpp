@@ -13,40 +13,6 @@ namespace argos {
    /****************************************/
    /****************************************/
 
-   class CTxOperation : public CPositionalIndex<CRadioEntity>::COperation { 
-
-   public:
-
-      CTxOperation(const CRadioEntity& c_tx_radio,
-                   const std::vector<CByteArray>& c_tx_data) :
-         m_cTxRadio(c_tx_radio),
-         m_cTxData(c_tx_data) {}
-
-      virtual bool operator()(CRadioEntity& c_rx_radio) {
-         if(&c_rx_radio != &m_cTxRadio) {
-            const CVector3& cRxRadioPosition = c_rx_radio.GetPosition();
-            const CVector3& cTxRadioPosition = m_cTxRadio.GetPosition();
-            Real fDistance = (cRxRadioPosition - cTxRadioPosition).Length();
-            if(fDistance < m_cTxRadio.GetRange()) {
-               for(const CByteArray& c_data : m_cTxData) {
-                  c_rx_radio.ReceiveData(cTxRadioPosition, c_data);
-               }
-            }
-         }
-         return true;
-      }
-
-   private:
-
-      const CRadioEntity& m_cTxRadio;
-      const std::vector<CByteArray>& m_cTxData;
-
-   };
-
-
-   /****************************************/
-   /****************************************/
-
    CRadiosDefaultActuator::CRadiosDefaultActuator() :
       m_pcRadioEquippedEntity(nullptr) {
    }
@@ -82,7 +48,6 @@ namespace argos {
          THROW_ARGOSEXCEPTION_NESTED("Error initializing the radios default actuator", ex);
       }
    }
-
    
    /****************************************/
    /****************************************/
@@ -118,16 +83,43 @@ namespace argos {
    /****************************************/
    /****************************************/
 
+   CRadiosDefaultActuator::CTxOperation::CTxOperation(const CRadioEntity& c_tx_radio,
+                                                      const std::vector<CByteArray>& c_tx_data) :
+      m_cTxRadio(c_tx_radio),
+      m_cTxData(c_tx_data) {}
+
+   /****************************************/
+   /****************************************/
+
+   bool CRadiosDefaultActuator::CTxOperation::operator()(CRadioEntity& c_rx_radio) {
+      if(&c_rx_radio != &m_cTxRadio) {
+         const CVector3& cRxRadioPosition = c_rx_radio.GetPosition();
+         const CVector3& cTxRadioPosition = m_cTxRadio.GetPosition();
+         Real fDistance = (cRxRadioPosition - cTxRadioPosition).Length();
+         if(fDistance < m_cTxRadio.GetRange()) {
+            for(const CByteArray& c_data : m_cTxData) {
+               c_rx_radio.ReceiveData(cTxRadioPosition, c_data);
+            }
+         }
+      }
+      return true;
+   }
+
+   /****************************************/
+   /****************************************/
+
    REGISTER_ACTUATOR(CRadiosDefaultActuator,
                      "radios", "default",
                      "Michael Allwright [allsey87@gmail.com]",
                      "1.0",
+
                      "A generic radio actuator to send messages to nearby radios.",
                      "This radio actuator implementation allows an arbitary number of messages\n"
                      "containing an arbitary number of bytes to be sent to nearby radios. The\n" 
                      "implementation of this actuator is very basic and any concepts such as\n"
                      "throughput, addressing, or formatting of a message's contents is beyond the\n"
                      "scope of this actuator's implementation.\n\n"
+
                      "REQUIRED XML CONFIGURATION\n\n"
                      "  <controllers>\n"
                      "    ...\n"
@@ -142,10 +134,14 @@ namespace argos {
                      "    </my_controller>\n"
                      "    ...\n"
                      "  </controllers>\n\n"
+
                      "The 'medium' attribute sets the id of the radio medium declared in the <media>\n"
                      "XML section.\n\n"
+
                      "OPTIONAL XML CONFIGURATION\n\n"
+
                      "None.\n",
+
                      "Usable"
    );
 
