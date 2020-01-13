@@ -41,8 +41,7 @@ namespace argos {
    static const Real LIDAR_SENSOR_RING_ELEVATION       = 0.06f;
    static const Real LIDAR_SENSOR_RING_RADIUS          = BODY_RADIUS;
    static const CRadians LIDAR_SENSOR_RING_START_ANGLE = CRadians((ARGOS_PI / 12.0f) * 0.5f);
-   static const Real LIDAR_SENSOR_RING_RANGE           = 4.0f;
-
+   
    static const Real PROXIMITY_SENSOR_RING_ELEVATION       = 0.06f;
    static const Real PROXIMITY_SENSOR_RING_RADIUS          = BODY_RADIUS;
    static const CRadians PROXIMITY_SENSOR_RING_START_ANGLE = CRadians((ARGOS_PI / 12.0f) * 0.5f);
@@ -88,6 +87,8 @@ namespace argos {
                                   const std::string& str_controller_id,
                                   const CVector3& c_position,
                                   const CQuaternion& c_orientation,
+                                  Real f_lidar_range,
+                                  UInt32 f_lidar_num_sensors,
                                   Real f_rab_range,
                                   size_t un_rab_data_size,
                                   const std::string& str_bat_model,
@@ -154,8 +155,8 @@ namespace argos {
             CVector3(0.0f, 0.0f, LIDAR_SENSOR_RING_ELEVATION),
             LIDAR_SENSOR_RING_RADIUS,
             LIDAR_SENSOR_RING_START_ANGLE,
-            LIDAR_SENSOR_RING_RANGE,
-            512,
+            f_lidar_range,
+            f_lidar_num_sensors,
             m_pcEmbodiedEntity->GetOriginAnchor());
          /* Proximity sensor equipped entity */
          m_pcProximitySensorEquippedEntity =
@@ -319,6 +320,10 @@ namespace argos {
             CVector3(0.0f, 0.0f, BEACON_ELEVATION),
             cTurretAnchor);
         /* Lidar sensor equipped entity */
+        Real fLidarRange = 3.0f;
+        GetNodeAttributeOrDefault(t_tree, "lidar_range", fLidarRange, fLidarRange);
+        UInt32 fLidarNumSensors = 512;
+        GetNodeAttributeOrDefault(t_tree, "lidar_num_sensors", fLidarNumSensors, fLidarNumSensors);
         m_pcLidarSensorEquippedEntity =
             new CLidarSensorEquippedEntity(this, "lidar_0");
         AddComponent(*m_pcLidarSensorEquippedEntity);
@@ -326,8 +331,8 @@ namespace argos {
             CVector3(0.0f, 0.0f, LIDAR_SENSOR_RING_ELEVATION),
             LIDAR_SENSOR_RING_RADIUS,
             LIDAR_SENSOR_RING_START_ANGLE,
-            LIDAR_SENSOR_RING_RANGE,
-            512,
+            fLidarRange,
+            fLidarNumSensors,
             m_pcEmbodiedEntity->GetOriginAnchor());
          /* Proximity sensor equipped entity */
          m_pcProximitySensorEquippedEntity =

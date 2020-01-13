@@ -45,6 +45,8 @@ namespace argos {
                      const std::string& str_controller_id,
                      const CVector3& c_position = CVector3(),
                      const CQuaternion& c_orientation = CQuaternion(),
+                     Real f_lidar_range = 3.0f,
+                     UInt32 f_lidar_num_sensors = 512,
                      Real f_rab_range = 3.0f,
                      size_t un_rab_data_size = 10,
                      const std::string& str_bat_model = "",

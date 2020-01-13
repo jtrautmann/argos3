@@ -63,7 +63,21 @@ namespace argos {
 
    void CFootBotLidarDefaultSensor::Update() {
       m_pcLidarImpl->Update();
-      for(size_t i = 0; i < m_pcLidarImpl->GetReadings().size(); ++i) {
+      
+      size_t size = m_pcLidarImpl->GetReadings().size();
+      
+      // adapt readings size if needed
+      if (m_tReadings.size() != size) {
+         m_tReadings = TReadings(size);
+         CRadians spacing = CRadians(2.0*ARGOS_PI / (Real)size);
+         CRadians start_angle = spacing * 0.5f;
+         for(size_t i = 0; i < size; ++i) {
+            m_tReadings[i].Angle = start_angle + i * spacing;
+            m_tReadings[i].Angle.SignedNormalize();
+         }
+      }
+
+      for(size_t i = 0; i < size; ++i) {
          m_tReadings[i].Value = m_pcLidarImpl->GetReadings()[i];
       }
    }
